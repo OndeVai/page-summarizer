@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Page Summarizer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Page Summarizer</h1>
+
+    <div id="prompt-section">
+      <button id="toggle-prompt" class="toggle-button">
+        Change Settings
+        <span class="arrow">&darr;</span>
+      </button>
+      <div id="prompt-content" class="collapsible-content hidden">
+        <div id="api-key-section">
+          <label for="api-key">Claude API Key:</label>
+          <input type="password" id="api-key" placeholder="Enter your API key">
+          <button id="save-key">Save Key</button>
+        </div>
+        <div id="prompt-edit-section">
+          <label for="prompt">Custom Instructions:</label>
+          <textarea id="prompt" rows="3" placeholder="Enter custom instructions for the summary"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div id="summary-section">
+      <button id="summarize" disabled>Summarize Page</button>
+      <div id="loading" class="hidden">
+        <div class="spinner"></div>
+        <p>Generating summary...</p>
+      </div>
+      <div id="error" class="hidden"></div>
+      <div id="summary" class="hidden"></div>
+    </div>
+  </div>
+  <script src="crypto.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html> 
