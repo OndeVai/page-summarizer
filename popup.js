@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const apiKeyInput = document.getElementById("api-key");
   const saveKeyButton = document.getElementById("save-key");
   const summarizeButton = document.getElementById("summarize");
-  const loadingIndicator = document.getElementById("loading");
   const errorDisplay = document.getElementById("error");
   const summaryDisplay = document.getElementById("summary");
   const togglePromptButton = document.getElementById("toggle-prompt");
@@ -14,10 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     "summarize in a 1 min read. use concise bullet points. i want the easiest to digest material. cite any potential political bias in another 20 second read below the rest. Use html li bullett points and add an h1 html title:";
 
   // Initialize UI state
-  loadingIndicator.classList.add("hidden");
   errorDisplay.classList.add("hidden");
   summaryDisplay.innerHTML = "Click above to show summary of page";
-  summaryDisplay.classList.remove("hidden");
 
   // Load saved API key and prompt from local storage
   chrome.storage.local.get(["apiKey", "customPrompt"], (result) => {
@@ -74,9 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Reset UI state
-    loadingIndicator.classList.remove("hidden");
     errorDisplay.classList.add("hidden");
-    summaryDisplay.classList.add("hidden");
     summarizeButton.disabled = true;
 
     try {
@@ -117,12 +112,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Display summary with HTML support
       summaryDisplay.innerHTML = summaryResponse;
-      summaryDisplay.classList.remove("hidden");
     } catch (error) {
       showError(error.message || "Failed to generate summary");
     } finally {
       // Ensure loading indicator is hidden
-      loadingIndicator.classList.add("hidden");
       summarizeButton.disabled = false;
     }
   });
