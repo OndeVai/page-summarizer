@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const promptContent = document.getElementById("prompt-content");
   const promptInput = document.getElementById("prompt");
 
+  let bufferedContent = "";
+
   // Default prompt
   const defaultPrompt =
     "summarize in a 1 min read. use concise bullet points. i want the easiest to digest material. cite any potential political bias in another 20 second read below the rest. Use html li bullett points and add an h1 html title:";
@@ -62,6 +64,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     chrome.storage.local.set({ customPrompt: prompt });
   });
 
+  // Listen for streaming tokens
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === "streamToken") {
+      // Show summary section if it's the first token
+      if (summaryDisplay.textContent === "") {
+        summaryDisplay.classList.remove("hidden");
+        errorDisplay.classList.add("hidden");
+      }
+      bufferedContent += message.token;
+      // Append the new token
+      summaryDisplay.innerHTML = bufferedContent;
+    } else if (message.type === "streamComplete") {
+      summarizeButton.disabled = false;
+    } else if (message.type === "error") {
+      errorDisplay.textContent = message.error;
+      errorDisplay.classList.toggle("hidden", !message.error);
+      summarizeButton.disabled = false;
+    }
+  });
+
   // Handle summarize button click
   summarizeButton.addEventListener("click", async () => {
     const apiKey = apiKeyInput.value.trim();
@@ -98,20 +120,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       // Send content to background script for Claude API call
-      const summaryResponse = await chrome.runtime.sendMessage({
+      summaryDisplay.textContent = "";
+      bufferedContent = "";
+      await chrome.runtime.sendMessage({
         action: "summarize",
         content: response.content,
         apiKey: apiKey,
         prompt: promptInput.value.trim(),
       });
-
-      // Handle the response
-      if (summaryResponse.error) {
-        throw new Error(summaryResponse.error);
-      }
-
-      // Display summary with HTML support
-      summaryDisplay.innerHTML = summaryResponse;
     } catch (error) {
       showError(error.message || "Failed to generate summary");
     } finally {
