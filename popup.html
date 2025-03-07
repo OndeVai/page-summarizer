@@ -6,16 +6,19 @@
 </head>
 <body>
   <div class="container">
-    <h1>Page Summarizer</h1>
-
-    <div id="prompt-section">
-      <button id="toggle-prompt" class="toggle-button">
-        Change Settings
-        <span class="arrow">&darr;</span>
-      </button>
+    <div id="summary-section">
+      <div id="controls">
+        <button id="summarize" disabled>Summarize Page</button>
+        
+          <button id="toggle-prompt" class="toggle-button">
+            Change Settings
+            <span class="arrow">&darr;</span>
+          </button>
+        
+      </div>
       <div id="prompt-content" class="collapsible-content hidden">
         <div id="api-key-section">
-          <label for="api-key">Claude API Key:</label>
+          <label for="api-key">OpenAI API Key:</label>
           <input type="password" id="api-key" placeholder="Enter your API key">
           <button id="save-key">Save Key</button>
         </div>
@@ -24,15 +27,11 @@
           <textarea id="prompt" rows="3" placeholder="Enter custom instructions for the summary"></textarea>
         </div>
       </div>
-    </div>
-
-    <div id="summary-section">
-      <button id="summarize" disabled>Summarize Page</button>
       <div id="error" class="hidden"></div>
       <div id="summary"></div>
     </div>
+    
   </div>
-  <script src="crypto.js"></script>
   <script src="popup.js"></script>
 </body>
 </html> 
