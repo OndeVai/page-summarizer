@@ -15,8 +15,11 @@ body {
 
 h1 {
   margin: 0;
-  font-size: 24px;
-  color: #333;
+  font-size: 18px;
+}
+
+#summary h1, h2, p {
+  color: #fff !important;
 }
 
 #api-key-section {
@@ -106,11 +109,12 @@ button:disabled {
   display: block;
   padding: 15px;
   margin-top: 10px;
-  background-color: #f8f9fa;
+  background-color: #202020;
   border-radius: 4px;
   max-height: none;
   overflow-y: visible;
-  font-size: 18px;
+  font-size: 16px;
+  color: #fff !important;
 }
 
 #summary p {

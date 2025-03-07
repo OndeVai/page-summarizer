@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let bufferedContent = "";
 
+  const incompleteTagRegex = /<[^>]*$/;
+
+  function hasIncompleteTag(str) {
+    return incompleteTagRegex.test(str);
+  }
   // Default prompt
   const defaultPrompt =
     "summarize in a 1 min read. use concise bullet points. i want the easiest to digest material. cite any potential political bias in another 20 second read below the rest. Use html li bullett points and add an h1 html title:";
@@ -73,8 +78,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         errorDisplay.classList.add("hidden");
       }
       bufferedContent += message.token;
-      // Append the new token
-      summaryDisplay.innerHTML = bufferedContent;
+
+      if (!hasIncompleteTag(bufferedContent)) {
+        // Append the new token
+        summaryDisplay.innerHTML = bufferedContent;
+      }
     } else if (message.type === "streamComplete") {
       summarizeButton.disabled = false;
     } else if (message.type === "error") {

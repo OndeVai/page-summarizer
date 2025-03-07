@@ -44,9 +44,6 @@ async function summarizeContent(tab, content, prompt, apiKey) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 
-    let isFormingHtmlTag = false;
-    let bufferedContent = "";
-
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
@@ -59,25 +56,12 @@ async function summarizeContent(tab, content, prompt, apiKey) {
           const json = JSON.parse(line.slice(6));
           const token = json.choices[0]?.delta?.content || "";
           if (token) {
-            if (isHtmlStartToken(token)) {
-              isFormingHtmlTag = true;
-              bufferedContent = "";
-            }
-            if (isFormingHtmlTag) {
-              bufferedContent += token;
-              isFormingHtmlTag = !isHtmlEndToken(token);
-            } else {
-              bufferedContent = token;
-            }
-
-            if (!isFormingHtmlTag) {
-              // console.log(bufferedContent);
-              // Send each token to the popup
-              chrome.runtime.sendMessage({
-                type: "streamToken",
-                token: bufferedContent,
-              });
-            }
+            // console.log(bufferedContent);
+            // Send each token to the popup
+            chrome.runtime.sendMessage({
+              type: "streamToken",
+              token: token,
+            });
           }
         }
       }
@@ -91,13 +75,4 @@ async function summarizeContent(tab, content, prompt, apiKey) {
       error: error.message,
     });
   }
-}
-
-//todo regex instead
-function isHtmlStartToken(token) {
-  return token.includes("<");
-}
-
-function isHtmlEndToken(token) {
-  return token.includes(">");
 }
