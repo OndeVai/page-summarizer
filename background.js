@@ -76,3 +76,8 @@ async function summarizeContent(tab, content, prompt, apiKey) {
     });
   }
 }
+
+// Add export at the end of the file
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { summarizeContent };
+}
