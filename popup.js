@@ -15,6 +15,63 @@ document.addEventListener("DOMContentLoaded", async () => {
   function hasIncompleteTag(str) {
     return incompleteTagRegex.test(str);
   }
+
+  // Create overlay when popup opens
+  createOverlay();
+
+  // Create a connection to the content script that will be closed when popup closes
+  let contentPort;
+
+  // Function to create overlay
+  async function createOverlay() {
+    try {
+      // Get the active tab
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+
+      // Inject content script if not already injected
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ["content.js"],
+        });
+      } catch (error) {
+        // Ignore error if script is already injected
+        console.log("Content script may already be injected:", error);
+      }
+
+      // Send message to content script to create overlay
+      await chrome.tabs.sendMessage(tab.id, {
+        action: "createOverlay",
+      });
+
+      // Create a connection that will be used to detect when popup closes
+      contentPort = chrome.tabs.connect(tab.id, { name: "overlay-connection" });
+    } catch (error) {
+      console.error("Failed to create overlay:", error);
+    }
+  }
+
+  // Function to remove overlay
+  async function removeOverlay() {
+    try {
+      // Get the active tab
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+
+      // Send message to content script to remove overlay
+      await chrome.tabs.sendMessage(tab.id, {
+        action: "removeOverlay",
+      });
+    } catch (error) {
+      console.error("Failed to remove overlay:", error);
+    }
+  }
+
   // Default prompt
   const defaultPrompt =
     "summarize in a 1 min read. use concise bullet points. i want the easiest to digest material. cite any potential political bias in another 20 second read below the rest. Use html li bullett points and add an h1 html title:";
