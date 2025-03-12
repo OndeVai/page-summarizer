@@ -4,6 +4,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   margin: 0;
   box-sizing: border-box;
+  background-color: #f8f9fa;
+  color: #333;
 }
 
 .container {
@@ -11,6 +13,7 @@ body {
   flex-direction: column;
   gap: 20px;
   min-height: 100%;
+  max-width: 100%;
 }
 
 h1 {
@@ -30,39 +33,54 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 15px;
 }
 
 #api-key-section {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-bottom: 15px;
 }
 
 input[type="password"] {
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  background-color: #fff;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 button {
-  padding: 8px 16px;
-  background-color: #007bff;
+  padding: 10px 16px;
+  background-color: #4a6fa5;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #3a5a8c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .hidden {
@@ -109,26 +127,51 @@ button:disabled {
 
 #error {
   display: none;
-  color: #dc3545;
-  padding: 10px;
-  background-color: #f8d7da;
-  border-radius: 4px;
+  color: #e53e3e;
+  padding: 12px;
+  background-color: #fff5f5;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  border-left: 4px solid #e53e3e;
+  font-size: 14px;
 }
 
 #summary {
   display: block;
-  padding: 10px;
-  margin-top: 10px;
-  background-color: #202020;
-  border-radius: 4px;
+  padding: 20px;
+  margin-top: 15px;
+  background-color: #1e1e2e;
+  border-radius: 8px;
   max-height: none;
   overflow-y: visible;
   font-size: 16px;
-  color: #fff !important;
+  color: #f8f9fa !important;
+  line-height: 1.6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #2d2d3a;
+}
+
+#summary h1 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 24px;
+  color: #f8f9fa !important;
+  border-bottom: 1px solid #3d3d4f;
+  padding-bottom: 10px;
+  font-weight: 600;
+}
+
+#summary h2 {
+  font-size: 20px;
+  margin-top: 20px;
+  margin-bottom: 12px;
+  color: #f8f9fa !important;
 }
 
 #summary p {
-  margin: 0 0 10px 0;
+  margin: 0 0 16px 0;
+  color: #e9ecef !important;
+  font-size: 16px;
 }
 
 #summary p:last-child {
@@ -136,48 +179,42 @@ button:disabled {
 }
 
 #summary ul, #summary ol {
-  margin: 6px 0;
-  padding-left: 20px;
+  margin: 10px 0;
+  padding-left: 24px;
+  color: #e9ecef !important;
 }
 
 #summary li {
-  margin: 2px 0;
+  margin: 8px 0;
+  padding-left: 4px;
 }
 
-#summary code {
-  background-color: #e9ecef;
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-family: monospace;
-}
-
-#summary pre {
-  background-color: #e9ecef;
-  padding: 10px;
-  border-radius: 4px;
-  overflow-x: auto;
-  margin: 10px 0;
-}
-
-#summary pre code {
-  background-color: transparent;
-  padding: 0;
-}
-
-#summary blockquote {
-  border-left: 4px solid #dee2e6;
-  margin: 10px 0;
-  padding-left: 10px;
-  color: #6c757d;
+#summary li::marker {
+  color: #7b9cd6;
 }
 
 #summary a {
-  color: #007bff;
+  color: #61afef !important;
   text-decoration: none;
+  border-bottom: 1px dotted #61afef;
 }
 
 #summary a:hover {
-  text-decoration: underline;
+  border-bottom: 1px solid #61afef;
+}
+
+#summary code {
+  background-color: #2d2d3a;
+  color: #e6e6e6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+}
+
+/* Ensure error is visible when not hidden */
+#error:not(.hidden) {
+  display: block;
 }
 
 #summary h1, #summary h2, #summary h3, #summary h4, #summary h5, #summary h6 {
@@ -189,8 +226,13 @@ button:disabled {
 #summary h3 { font-size: 1.2em; }
 
 #prompt-content {
-  margin-top: 10px;
+  background-color: #f0f4f8;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  border: 1px solid #e0e4e8;
 }
+
 /* New styles for prompt section */
 #prompt-section {
   display: flex;
@@ -207,8 +249,6 @@ button:disabled {
 #prompt-edit-section {
   padding-top: 10px;
 } 
-
-
 
 .toggle-button {
   display: flex;
@@ -244,15 +284,15 @@ button:disabled {
 }
 
 textarea {
-  width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
   resize: vertical;
-  min-height: 60px;
-  box-sizing: border-box;
-  max-width: 100%;
+  min-height: 80px;
+  background-color: #fff;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-family: inherit;
 }
 
 #content-section {
@@ -268,4 +308,57 @@ textarea {
   padding: 20px;
   min-height: 100px;
   justify-content: center;
+}
+
+label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #4a5568;
+}
+
+#summary-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+}
+
+/* Initial placeholder styling */
+#summary:empty::before,
+#summary p:only-child:empty::before,
+#summary:has(p:only-child:empty)::before {
+  content: "Click the button above to generate a summary";
+  color: #718096;
+  font-style: italic;
+  display: block;
+  text-align: center;
+  padding: 30px 0;
+}
+
+/* Add a nice scrollbar for the summary */
+#summary {
+  scrollbar-width: thin;
+  scrollbar-color: #4a6fa5 #e2e8f0;
+}
+
+#summary::-webkit-scrollbar {
+  width: 8px;
+}
+
+#summary::-webkit-scrollbar-track {
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+
+#summary::-webkit-scrollbar-thumb {
+  background-color: #4a6fa5;
+  border-radius: 4px;
+}
+
+/* Add a max height with scrolling for very long summaries */
+@media (min-height: 700px) {
+  #summary {
+    max-height: 500px;
+    overflow-y: auto;
+  }
 } 

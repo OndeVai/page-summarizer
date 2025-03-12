@@ -40,12 +40,16 @@ function createOverlay() {
   overlay.style.left = "0";
   overlay.style.width = "100%";
   overlay.style.height = "100%";
-  overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+  overlay.style.backgroundColor = "rgba(0, 0, 0, 0.65)"; // Darker overlay for better contrast
   overlay.style.zIndex = "2147483647"; // Maximum z-index value
   overlay.style.transition = "opacity 0.3s ease";
   overlay.style.opacity = "0";
-  overlay.style.backdropFilter = "blur(2px)";
+  overlay.style.backdropFilter = "blur(3px)"; // Increased blur for better visual effect
   overlay.style.pointerEvents = "none"; // Allow clicking through the overlay
+
+  // Add a subtle gradient to make it more visually interesting
+  overlay.style.background =
+    "linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.6) 100%)";
 
   // Add overlay to the page
   if (document.body) {

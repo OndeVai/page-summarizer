@@ -74,11 +74,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Default prompt
   const defaultPrompt =
-    "summarize in a 1 min read. use concise bullet points. i want the easiest to digest material. cite any potential political bias in another 20 second read below the rest. Use html li bullett points and add an h1 html title:";
+    "summarize in a 1 min read. use concise bullet points. i want the easiest to digest material. Use proper HTML formatting with <h1> for title, <ul> for lists, and <li> for bullet points. Add spacing between sections for readability. cite any potential political bias in another section below the rest with an <h2> heading.";
 
   // Initialize UI state
   errorDisplay.classList.add("hidden");
-  summaryDisplay.innerHTML = "Click above to show summary of page";
+  summaryDisplay.innerHTML = "<p>Click above to show summary of page</p>";
 
   // Load saved API key and prompt from local storage
   chrome.storage.local.get(["apiKey", "customPrompt"], (result) => {
