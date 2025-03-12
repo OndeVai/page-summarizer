@@ -7,8 +7,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const togglePromptButton = document.getElementById("toggle-prompt");
   const promptContent = document.getElementById("prompt-content");
   const promptInput = document.getElementById("prompt");
+  const followUpSection = document.getElementById("follow-up-section");
+  const followUpQuestion = document.getElementById("follow-up-question");
+  const submitFollowUpButton = document.getElementById("submit-follow-up");
 
   let bufferedContent = "";
+  let isProcessingFollowUp = false;
 
   const incompleteTagRegex = /<[^>]*$/;
 
@@ -91,6 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initialize UI state
   errorDisplay.classList.add("hidden");
   summaryDisplay.innerHTML = "<p>Click above to summarize</p>";
+  followUpSection.classList.add("hidden");
 
   // Load saved API key and prompt from local storage
   chrome.storage.local.get(["apiKey", "customPrompt"], (result) => {
@@ -142,28 +147,48 @@ document.addEventListener("DOMContentLoaded", async () => {
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === "streamToken") {
       // Show summary section if it's the first token
-      if (summaryDisplay.textContent === "") {
+      if (summaryDisplay.textContent === "" && !message.isFollowUp) {
         summaryDisplay.classList.remove("hidden");
         errorDisplay.classList.add("hidden");
 
         // Collapse the controls section when content starts displaying
         document.getElementById("controls").classList.add("collapsed");
       }
+
       bufferedContent += message.token;
 
       if (!hasIncompleteTag(bufferedContent)) {
         // Append the new token
-        summaryDisplay.innerHTML = bufferedContent;
+        if (message.isFollowUp) {
+          // For follow-up responses, append to existing content
+          summaryDisplay.innerHTML = bufferedContent;
+        } else {
+          // For initial summary, replace content
+          summaryDisplay.innerHTML = bufferedContent;
+        }
       }
     } else if (message.type === "streamComplete") {
-      summarizeButton.disabled = false;
+      if (message.isFollowUp) {
+        isProcessingFollowUp = false;
+        submitFollowUpButton.disabled = false;
+        followUpQuestion.value = "";
+      } else {
+        summarizeButton.disabled = false;
+        // Show follow-up section after initial summary is complete
+        followUpSection.classList.remove("hidden");
+      }
     } else if (message.type === "error") {
       errorDisplay.textContent = message.error;
       errorDisplay.classList.toggle("hidden", !message.error);
-      summarizeButton.disabled = false;
 
-      // Show controls again if there's an error
-      document.getElementById("controls").classList.remove("collapsed");
+      if (message.isFollowUp) {
+        isProcessingFollowUp = false;
+        submitFollowUpButton.disabled = false;
+      } else {
+        summarizeButton.disabled = false;
+        // Show controls again if there's an error
+        document.getElementById("controls").classList.remove("collapsed");
+      }
     }
   });
 
@@ -204,7 +229,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Send content to background script for Claude API call
       summaryDisplay.textContent = "";
-      bufferedContent = "";
+      // bufferedContent = "";
       await chrome.runtime.sendMessage({
         action: "summarize",
         content: response.content,
@@ -216,6 +241,56 @@ document.addEventListener("DOMContentLoaded", async () => {
     } finally {
       // Ensure loading indicator is hidden
       summarizeButton.disabled = false;
+    }
+  });
+
+  // Handle follow-up question submission
+  submitFollowUpButton.addEventListener("click", async () => {
+    const question = followUpQuestion.value.trim();
+    if (!question) {
+      return;
+    }
+
+    const apiKey = apiKeyInput.value.trim();
+    if (!apiKey) {
+      showError("Please enter an API key");
+      return;
+    }
+
+    // Disable button and show loading state
+    submitFollowUpButton.disabled = true;
+    isProcessingFollowUp = true;
+    errorDisplay.classList.add("hidden");
+
+    try {
+      // Add the user's question to the summary display
+      bufferedContent += `<div class="user-question"><p><strong>You:</strong> ${question}</p></div>`;
+
+      // Add a placeholder for the assistant's response
+      bufferedContent += `<div class="assistant-response"><p><strong>Assistant:</strong> </p></div>`;
+
+      summaryDisplay.innerHTML = bufferedContent;
+      // Reset buffer for streaming response
+      // bufferedContent = "";
+
+      // Send follow-up question to background script
+      await chrome.runtime.sendMessage({
+        action: "followUpQuestion",
+        question: question,
+        apiKey: apiKey,
+      });
+    } catch (error) {
+      showError(error.message || "Failed to process follow-up question");
+      submitFollowUpButton.disabled = false;
+      isProcessingFollowUp = false;
+    }
+  });
+
+  // Add enter key handler for follow-up question
+  followUpQuestion.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey && !submitFollowUpButton.disabled) {
+      e.preventDefault();
+      submitFollowUpButton.click();
     }
   });
 
