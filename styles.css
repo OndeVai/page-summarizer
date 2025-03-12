@@ -1,6 +1,6 @@
 body {
   width: 800px;
-  padding: 20px;
+  padding: 16px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   margin: 0;
   box-sizing: border-box;
@@ -11,7 +11,7 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
   min-height: 100%;
   max-width: 100%;
 }
@@ -33,7 +33,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 #api-key-section {
@@ -53,13 +53,13 @@ input[type="password"] {
 }
 
 button {
-  padding: 10px 16px;
+  padding: 8px 14px;
   background-color: #4a6fa5;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -144,34 +144,38 @@ button:disabled {
   border-radius: 8px;
   max-height: none;
   overflow-y: visible;
-  font-size: 16px;
+  font-size: 18px;
   color: #f8f9fa !important;
-  line-height: 1.6;
+  line-height: 1.5;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: 1px solid #2d2d3a;
+  letter-spacing: 0.01em;
+  word-spacing: 0.05em;
+  font-weight: 400;
 }
 
 #summary h1 {
   margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 24px;
+  margin-bottom: 14px;
+  font-size: 26px;
   color: #f8f9fa !important;
   border-bottom: 1px solid #3d3d4f;
-  padding-bottom: 10px;
+  padding-bottom: 8px;
   font-weight: 600;
 }
 
 #summary h2 {
-  font-size: 20px;
-  margin-top: 20px;
-  margin-bottom: 12px;
+  font-size: 22px;
+  margin-top: 16px;
+  margin-bottom: 10px;
   color: #f8f9fa !important;
 }
 
 #summary p {
-  margin: 0 0 16px 0;
-  color: #e9ecef !important;
-  font-size: 16px;
+  margin: 0 0 14px 0;
+  color: #ffffff !important;
+  font-size: 18px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 #summary p:last-child {
@@ -179,18 +183,22 @@ button:disabled {
 }
 
 #summary ul, #summary ol {
-  margin: 10px 0;
+  margin: 8px 0;
   padding-left: 24px;
-  color: #e9ecef !important;
+  color: #ffffff !important;
 }
 
 #summary li {
-  margin: 8px 0;
+  margin: 6px 0;
   padding-left: 4px;
+  font-size: 18px;
+  color: #ffffff !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 #summary li::marker {
-  color: #7b9cd6;
+  color: #90caf9;
+  font-size: 1.1em;
 }
 
 #summary a {
@@ -227,9 +235,9 @@ button:disabled {
 
 #prompt-content {
   background-color: #f0f4f8;
-  padding: 15px;
+  padding: 12px;
   border-radius: 6px;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   border: 1px solid #e0e4e8;
 }
 
@@ -320,7 +328,7 @@ label {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  padding: 20px;
+  padding: 16px;
 }
 
 /* Initial placeholder styling */
@@ -332,7 +340,8 @@ label {
   font-style: italic;
   display: block;
   text-align: center;
-  padding: 30px 0;
+  padding: 20px 0;
+  font-size: 18px;
 }
 
 /* Add a nice scrollbar for the summary */
@@ -358,7 +367,51 @@ label {
 /* Add a max height with scrolling for very long summaries */
 @media (min-height: 700px) {
   #summary {
-    max-height: 500px;
+    max-height: 550px;
     overflow-y: auto;
   }
+}
+
+/* Responsive adjustments based on viewport height */
+@media (max-height: 600px) {
+  /* For very small popup heights */
+  #summary {
+    padding: 16px;
+    font-size: 17px;
+  }
+  
+  #summary h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  #summary li {
+    margin: 4px 0;
+  }
+}
+
+@media (min-height: 800px) {
+  /* For larger popup heights */
+  #summary {
+    max-height: 600px;
+  }
+}
+
+/* Improve contrast for better readability */
+#summary p, #summary li {
+  color: #ffffff !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Make bullet points more visible */
+#summary li::marker {
+  color: #90caf9;
+  font-size: 1.1em;
+}
+
+/* Ensure headings stand out */
+#summary h1, #summary h2 {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.02em;
 } 

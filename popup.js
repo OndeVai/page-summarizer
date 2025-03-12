@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Default prompt
   const defaultPrompt =
-    "summarize in a 1 min read. use concise bullet points. i want the easiest to digest material. Use proper HTML formatting with <h1> for title, <ul> for lists, and <li> for bullet points. Add spacing between sections for readability. cite any potential political bias in another section below the rest with an <h2> heading.";
+    "summarize in a 1 min read. use concise bullet points. i want the easiest to digest material with larger, readable text. Use proper HTML formatting with <h1> for title, <ul> for lists, and <li> for bullet points. Keep paragraphs short (2-3 sentences max). Use fewer bullet points but make them more meaningful. cite any potential political bias in another section below the rest with an <h2> heading.";
 
   // Initialize UI state
   errorDisplay.classList.add("hidden");
