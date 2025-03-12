@@ -22,6 +22,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Create a connection to the content script that will be closed when popup closes
   let contentPort;
 
+  // Add click handler for the summary section to toggle controls visibility
+  document.getElementById("summary-section").addEventListener("click", (e) => {
+    // Check if the click was near the top-right corner (where the gear icon is)
+    const rect = e.currentTarget.getBoundingClientRect();
+    const isTopRight = e.clientX > rect.right - 30 && e.clientY < rect.top + 30;
+
+    if (isTopRight) {
+      // Toggle the collapsed state of controls
+      document.getElementById("controls").classList.toggle("collapsed");
+    }
+  });
+
   // Function to create overlay
   async function createOverlay() {
     try {
@@ -78,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Initialize UI state
   errorDisplay.classList.add("hidden");
-  summaryDisplay.innerHTML = "<p>Click above to show summary of page</p>";
+  summaryDisplay.innerHTML = "<p>Click above to summarize</p>";
 
   // Load saved API key and prompt from local storage
   chrome.storage.local.get(["apiKey", "customPrompt"], (result) => {
@@ -133,6 +145,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (summaryDisplay.textContent === "") {
         summaryDisplay.classList.remove("hidden");
         errorDisplay.classList.add("hidden");
+
+        // Collapse the controls section when content starts displaying
+        document.getElementById("controls").classList.add("collapsed");
       }
       bufferedContent += message.token;
 
@@ -146,6 +161,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       errorDisplay.textContent = message.error;
       errorDisplay.classList.toggle("hidden", !message.error);
       summarizeButton.disabled = false;
+
+      // Show controls again if there's an error
+      document.getElementById("controls").classList.remove("collapsed");
     }
   });
 

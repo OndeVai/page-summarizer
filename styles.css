@@ -1,6 +1,6 @@
 body {
   width: 800px;
-  padding: 16px;
+  padding: 12px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   margin: 0;
   box-sizing: border-box;
@@ -11,7 +11,7 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   min-height: 100%;
   max-width: 100%;
 }
@@ -33,18 +33,30 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  max-height: 40px;
+}
+
+/* Collapsed state for controls */
+#controls.collapsed {
+  max-height: 0;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 #api-key-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 input[type="password"] {
-  padding: 10px;
+  padding: 6px 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
@@ -53,7 +65,7 @@ input[type="password"] {
 }
 
 button {
-  padding: 8px 14px;
+  padding: 6px 12px;
   background-color: #4a6fa5;
   color: white;
   border: none;
@@ -128,25 +140,25 @@ button:disabled {
 #error {
   display: none;
   color: #e53e3e;
-  padding: 12px;
+  padding: 8px;
   background-color: #fff5f5;
   border-radius: 6px;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
   border-left: 4px solid #e53e3e;
   font-size: 14px;
 }
 
 #summary {
   display: block;
-  padding: 20px;
-  margin-top: 15px;
+  padding: 16px;
+  margin-top: 8px;
   background-color: #1e1e2e;
   border-radius: 8px;
   max-height: none;
   overflow-y: visible;
   font-size: 18px;
   color: #f8f9fa !important;
-  line-height: 1.5;
+  line-height: 1.4;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: 1px solid #2d2d3a;
   letter-spacing: 0.01em;
@@ -156,23 +168,23 @@ button:disabled {
 
 #summary h1 {
   margin-top: 0;
-  margin-bottom: 14px;
-  font-size: 26px;
+  margin-bottom: 10px;
+  font-size: 24px;
   color: #f8f9fa !important;
   border-bottom: 1px solid #3d3d4f;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   font-weight: 600;
 }
 
 #summary h2 {
-  font-size: 22px;
-  margin-top: 16px;
-  margin-bottom: 10px;
+  font-size: 20px;
+  margin-top: 12px;
+  margin-bottom: 8px;
   color: #f8f9fa !important;
 }
 
 #summary p {
-  margin: 0 0 14px 0;
+  margin: 0 0 10px 0;
   color: #ffffff !important;
   font-size: 18px;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
@@ -183,13 +195,13 @@ button:disabled {
 }
 
 #summary ul, #summary ol {
-  margin: 8px 0;
+  margin: 6px 0;
   padding-left: 24px;
   color: #ffffff !important;
 }
 
 #summary li {
-  margin: 6px 0;
+  margin: 4px 0;
   padding-left: 4px;
   font-size: 18px;
   color: #ffffff !important;
@@ -226,7 +238,7 @@ button:disabled {
 }
 
 #summary h1, #summary h2, #summary h3, #summary h4, #summary h5, #summary h6 {
-  margin: 10px 0 10px 0;
+  margin: 8px 0 8px 0;
 }
 
 #summary h1 { font-size: 1.5em; margin-top: 0; }
@@ -235,9 +247,9 @@ button:disabled {
 
 #prompt-content {
   background-color: #f0f4f8;
-  padding: 12px;
+  padding: 8px;
   border-radius: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   border: 1px solid #e0e4e8;
 }
 
@@ -255,7 +267,7 @@ button:disabled {
 }
 
 #prompt-edit-section {
-  padding-top: 10px;
+  padding-top: 6px;
 } 
 
 .toggle-button {
@@ -292,12 +304,12 @@ button:disabled {
 }
 
 textarea {
-  padding: 10px;
+  padding: 6px 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
   resize: vertical;
-  min-height: 80px;
+  min-height: 60px;
   background-color: #fff;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
   font-family: inherit;
@@ -328,20 +340,38 @@ label {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  padding: 16px;
+  padding: 12px;
+  position: relative;
+}
+
+/* Add a small show controls button that appears when controls are collapsed */
+#summary-section::before {
+  content: "⚙️";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+#controls.collapsed + #summary-section::before {
+  opacity: 1;
 }
 
 /* Initial placeholder styling */
 #summary:empty::before,
 #summary p:only-child:empty::before,
 #summary:has(p:only-child:empty)::before {
-  content: "Click the button above to generate a summary";
+  content: "Click to summarize";
   color: #718096;
   font-style: italic;
   display: block;
   text-align: center;
-  padding: 20px 0;
-  font-size: 18px;
+  padding: 8px 0;
+  font-size: 16px;
 }
 
 /* Add a nice scrollbar for the summary */
@@ -364,11 +394,25 @@ label {
   border-radius: 4px;
 }
 
-/* Add a max height with scrolling for very long summaries */
+/* Optimize media queries for better content display */
+@media (min-height: 600px) {
+  #summary {
+    max-height: 450px;
+    overflow-y: auto;
+  }
+}
+
 @media (min-height: 700px) {
   #summary {
-    max-height: 550px;
+    max-height: 600px; /* Increased from 580px */
     overflow-y: auto;
+  }
+}
+
+@media (min-height: 800px) {
+  /* For larger popup heights */
+  #summary {
+    max-height: 700px; /* Increased from 650px */
   }
 }
 
@@ -376,25 +420,38 @@ label {
 @media (max-height: 600px) {
   /* For very small popup heights */
   #summary {
-    padding: 16px;
+    padding: 12px; /* Further reduced from 16px */
     font-size: 17px;
   }
   
   #summary h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
+    font-size: 22px; /* Reduced from 24px */
+    margin-bottom: 8px; /* Reduced from 10px */
+    padding-bottom: 4px; /* Reduced from 6px */
   }
   
   #summary li {
-    margin: 4px 0;
+    margin: 3px 0; /* Reduced from 4px */
+  }
+  
+  body {
+    padding: 8px; /* Further reduced from 12px */
+  }
+  
+  .container {
+    gap: 6px; /* Further reduced from 8px */
   }
 }
 
-@media (min-height: 800px) {
-  /* For larger popup heights */
-  #summary {
-    max-height: 600px;
-  }
+/* Ensure the content takes up available space */
+#summary-section {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+#summary {
+  flex-grow: 1;
 }
 
 /* Improve contrast for better readability */
