@@ -39,7 +39,7 @@ The tests are organized into three main files:
 
 1. **popup.test.js** - Tests for the popup UI functionality
 2. **overlay.test.js** - Tests for the overlay functionality
-3. **background.test.js** - Tests for the background script functionality
+3. **background.test.js** - Tests for the background script functionality and OpenAI API integration
 
 ## Test Coverage
 
@@ -63,6 +63,16 @@ The tests cover the following functionality:
 - Message handling for summarization requests
 - Port connection handling
 
+### OpenAI API Integration Tests
+
+- Correct API call parameters and headers
+- Streaming response handling
+- Error handling (network errors, HTTP errors)
+- Edge cases:
+  - Empty prompts
+  - Malformed JSON responses
+  - Empty content in responses
+
 ### Coverage Results
 
 Current test coverage:
@@ -71,8 +81,8 @@ Current test coverage:
 ---------------|---------|----------|---------|---------|-------------------
 File           | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 ---------------|---------|----------|---------|---------|-------------------
-All files      |   96.29 |    77.77 |      75 |   96.15 | 11
- background.js |   96.29 |    77.77 |      75 |   96.15 | 11
+All files      |   96.29 |    88.88 |      75 |   96.15 | 11
+ background.js |   96.29 |    88.88 |      75 |   96.15 | 11
 ---------------|---------|----------|---------|---------|-------------------
 ```
 
@@ -124,6 +134,37 @@ global.chrome = {
     },
   },
 };
+```
+
+### OpenAI API Mocking
+
+The OpenAI API calls are mocked to simulate different response scenarios:
+
+```javascript
+// Mock streaming response
+const mockStream = new ReadableStream({
+  start(controller) {
+    const responses = [
+      'data: {"choices":[{"delta":{"content":"Hello"}}]}\n',
+      'data: {"choices":[{"delta":{"content":" world"}}]}\n',
+      "data: [DONE]\n",
+    ];
+
+    responses.forEach((response) => {
+      controller.enqueue(new TextEncoder().encode(response));
+    });
+    controller.close();
+  },
+});
+
+// Mock fetch response
+fetch.mockResolvedValueOnce({
+  ok: true,
+  body: mockStream,
+  headers: new Headers({
+    "content-type": "text/event-stream",
+  }),
+});
 ```
 
 ### Timer Mocking
@@ -202,6 +243,36 @@ global.chrome = {
 };
 ```
 
+### OpenAI API Test Failures
+
+If tests involving OpenAI API calls fail, check:
+
+1. The mock stream implementation is correct
+2. The TextEncoder/TextDecoder polyfills are properly set up
+3. The fetch mock is properly configured for streaming responses
+4. Error handling in the tests matches the implementation
+
+Example fix:
+
+```javascript
+// Ensure proper polyfills are in place
+const { ReadableStream } = require("stream/web");
+const { TextEncoder, TextDecoder } = require("util");
+
+global.ReadableStream = ReadableStream;
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
+// Mock fetch with proper streaming response
+global.fetch = jest.fn().mockResolvedValue({
+  ok: true,
+  body: mockStream,
+  headers: new Headers({
+    "content-type": "text/event-stream",
+  }),
+});
+```
+
 ## Troubleshooting
 
 If tests fail, check:
@@ -223,7 +294,9 @@ npm test -- -t "name of your test"
 To generate a code coverage report:
 
 ```
-npm test -- --coverage
+npm run test:coverage
 ```
 
 This will create a coverage report in the `coverage` directory, showing which parts of your code are tested and which are not.
+
+> **Note:** The `coverage` directory is included in `.gitignore` and will not be committed to the repository. This is standard practice as coverage files are generated artifacts and can be large.

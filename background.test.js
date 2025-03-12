@@ -45,6 +45,265 @@ global.fetch = jest.fn().mockImplementation(() =>
 // Now import the function we want to test
 const { summarizeContent } = require("./background.js");
 
+describe("OpenAI API Integration Tests", () => {
+  beforeEach(() => {
+    // Reset all mocks before each test
+    jest.clearAllMocks();
+  });
+
+  test("summarizeContent makes correct API call with proper parameters", async () => {
+    // Mock streaming response
+    const mockStream = new ReadableStream({
+      start(controller) {
+        const responses = [
+          'data: {"choices":[{"delta":{"content":"Hello"}}]}\n',
+          'data: {"choices":[{"delta":{"content":" world"}}]}\n',
+          "data: [DONE]\n",
+        ];
+
+        responses.forEach((response) => {
+          controller.enqueue(new TextEncoder().encode(response));
+        });
+        controller.close();
+      },
+    });
+
+    // Mock fetch response
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      body: mockStream,
+      headers: new Headers({
+        "content-type": "text/event-stream",
+      }),
+    });
+
+    // Test data
+    const tab = { id: 1 };
+    const content = "Test content";
+    const prompt = "Test prompt";
+    const apiKey = "test-api-key";
+
+    // Call the function
+    await summarizeContent(tab, content, prompt, apiKey);
+
+    // Verify API call parameters in detail
+    expect(fetch).toHaveBeenCalledWith(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer test-api-key",
+        },
+        body: JSON.stringify({
+          model: "gpt-4",
+          messages: [
+            {
+              role: "system",
+              content:
+                "format your response in html. use <h1> for the title, <p> for the body, <ul> for the list, <li> for the list item. Test prompt",
+            },
+            {
+              role: "user",
+              content: "Test content",
+            },
+          ],
+          stream: true,
+        }),
+      }
+    );
+
+    // Verify messages sent to popup
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      type: "streamToken",
+      token: "Hello",
+    });
+
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      type: "streamToken",
+      token: " world",
+    });
+
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      type: "streamComplete",
+    });
+  });
+
+  test("summarizeContent handles empty prompt correctly", async () => {
+    // Mock streaming response
+    const mockStream = new ReadableStream({
+      start(controller) {
+        const responses = [
+          'data: {"choices":[{"delta":{"content":"Summary"}}]}\n',
+          "data: [DONE]\n",
+        ];
+
+        responses.forEach((response) => {
+          controller.enqueue(new TextEncoder().encode(response));
+        });
+        controller.close();
+      },
+    });
+
+    // Mock fetch response
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      body: mockStream,
+      headers: new Headers({
+        "content-type": "text/event-stream",
+      }),
+    });
+
+    // Test data with empty prompt
+    const tab = { id: 1 };
+    const content = "Test content";
+    const prompt = "";
+    const apiKey = "test-api-key";
+
+    // Call the function
+    await summarizeContent(tab, content, prompt, apiKey);
+
+    // Verify system prompt doesn't have extra spaces
+    const fetchCall = fetch.mock.calls[0][1];
+    const body = JSON.parse(fetchCall.body);
+    expect(body.messages[0].content).toBe(
+      "format your response in html. use <h1> for the title, <p> for the body, <ul> for the list, <li> for the list item. "
+    );
+  });
+
+  test("summarizeContent handles HTTP error responses", async () => {
+    // Mock HTTP error response
+    fetch.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      statusText: "Unauthorized",
+      json: () => Promise.resolve({ error: "Invalid API key" }),
+    });
+
+    // Test data
+    const tab = { id: 1 };
+    const content = "Test content";
+    const prompt = "Test prompt";
+    const apiKey = "invalid-api-key";
+
+    // Call the function
+    await summarizeContent(tab, content, prompt, apiKey);
+
+    // Verify error handling
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      type: "error",
+      error: expect.any(String),
+    });
+  });
+
+  test("summarizeContent handles network errors", async () => {
+    // Mock network error
+    fetch.mockRejectedValueOnce(new Error("Network error"));
+
+    // Test data
+    const tab = { id: 1 };
+    const content = "Test content";
+    const prompt = "Test prompt";
+    const apiKey = "test-api-key";
+
+    // Call the function
+    await summarizeContent(tab, content, prompt, apiKey);
+
+    // Verify error handling
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      type: "error",
+      error: "Network error",
+    });
+  });
+
+  test("summarizeContent handles malformed streaming responses", async () => {
+    // Mock malformed streaming response
+    const mockStream = new ReadableStream({
+      start(controller) {
+        const responses = [
+          'data: {"malformed":json}\n',
+          'data: {"choices":[{"delta":{"content":"Valid token"}}]}\n',
+          "data: [DONE]\n",
+        ];
+
+        responses.forEach((response) => {
+          controller.enqueue(new TextEncoder().encode(response));
+        });
+        controller.close();
+      },
+    });
+
+    // Mock fetch response
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      body: mockStream,
+      headers: new Headers({
+        "content-type": "text/event-stream",
+      }),
+    });
+
+    // Test data
+    const tab = { id: 1 };
+    const content = "Test content";
+    const prompt = "Test prompt";
+    const apiKey = "test-api-key";
+
+    // Call the function
+    await summarizeContent(tab, content, prompt, apiKey);
+
+    // Verify error handling for malformed JSON
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      type: "error",
+      error: expect.stringContaining("is not valid JSON"),
+    });
+  });
+
+  test("summarizeContent handles empty content responses", async () => {
+    // Mock empty content in delta
+    const mockStream = new ReadableStream({
+      start(controller) {
+        const responses = [
+          'data: {"choices":[{"delta":{}}]}\n',
+          'data: {"choices":[{"delta":{"content":""}}]}\n',
+          'data: {"choices":[{"delta":{"content":"Content"}}]}\n',
+          "data: [DONE]\n",
+        ];
+
+        responses.forEach((response) => {
+          controller.enqueue(new TextEncoder().encode(response));
+        });
+        controller.close();
+      },
+    });
+
+    // Mock fetch response
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      body: mockStream,
+      headers: new Headers({
+        "content-type": "text/event-stream",
+      }),
+    });
+
+    // Test data
+    const tab = { id: 1 };
+    const content = "Test content";
+    const prompt = "Test prompt";
+    const apiKey = "test-api-key";
+
+    // Call the function
+    await summarizeContent(tab, content, prompt, apiKey);
+
+    // Verify only non-empty tokens are sent
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledTimes(2); // One for "Content" and one for completion
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      type: "streamToken",
+      token: "Content",
+    });
+  });
+});
+
+// Keep the existing tests
 describe("Background Script Tests", () => {
   beforeEach(() => {
     // Reset all mocks before each test

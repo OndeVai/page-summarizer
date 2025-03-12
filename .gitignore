@@ -19,3 +19,19 @@ node_modules
 .env.local
 
 .env.development.local
+
+# Test coverage output
+coverage/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
